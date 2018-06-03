@@ -1,4 +1,4 @@
-## ㅌBasic of JAVA
+## Basic of JAVA
 
 ### index
 
