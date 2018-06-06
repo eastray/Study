@@ -253,6 +253,200 @@ void testARM_Java9() throws IOException {
 
 ## 7. CompletableFuture API Improvements
 
+자바 SE 9에서 자바 SE 8에서 지원했던 CompletableFuture API가 가지는 문제점을 개선했다. 오라클은 delays, timeouts, utility method, sub-classing 등의 추가 기능을 지원한다.
+
+```java
+Executor exe = ComplitableFuture.delayedExecutur(50L, TimeUint.SECONDS);
+```
+
+Executors는 작업(Task)들을 비동기적으로 실행 시킬 수 있으며 기본적으로 스레드 풀을 운영한다. delayedExecutor() 메소드는 특정 시간동안 딜레이 한 후, 기본 실행자로 보내진 new Executor를 반환하는 static 유틸리티 메소드이다.
+
+CompletableFuture은 Future와 CompletionStage을 상속했으며, 각각의 클래스들의 특징을 담고있다. 
+
+Future는 멀티스레드 환경에서 비동기 방식을 지원하며 동시성(Concurrency) 효율을 향상 시킬 수 있다. 
+
+```
+암달의 법칙
+멀티 코어를 사용하는 프로그램의 속도는 프로그램 내부에서 존재하는 순차적(sequential) 부분이 사용하는 시간에 의해 제한된다.
+```
+
+스레드 간의 블럭이 많을수록 비효율적이며, 그것을 감소시키는 것이 동시성 프로그래밍의 목적이다.
+
+메인 스레드에서 어떠한 작업을 다른 스레드에게 할당하여 작업이 완료될 때 까지 기다리는 블로킹(Blocking)이 아닌, 다른 일을 하고 있다가 다른 스레드의 작업이 끝나면 그 결과 값을 받는 형태의 방식을 의미한다.
+
+CompletionStage는 동기식 또는 비동기식 계산 단위, 블록을 추상화하는 인터페이스이다. 여러 개의 ComplietionStage 또는 다른 작업 단위로 파이프 형태의 작업 흐름을 구성할 수 있다. 하나의 "stage" 작업(Task)이 "Completion"이 되면 또 다른 CompletionStage의 연산이 트리거 될 수 있다.
+
+-----
+
+## 8. Reactive Streams
+
+반응형 프로그래밍(Reactive Programming)은 응용 프로그램을 개발하는데 매우 유익하다. Scala, Play, Akka 등의 프레임워크는 이미 Reactive Streams를 통함하여 많은 이점을 취하고 있다. 오라클은 Java SE 9에서 새로운 Reactive Streams API를 도입했다.
+
+Reactive Streams API는 자바 언어를 사용하여 쉽게 비동기, 확장 가능, 병렬 프로그램을 구현하기 위한 Publish/Subscribe 프래임워크이다. 
+
+- java.util.concurrent.Flow
+- java.util.concurrent.Flow.Publisher
+- java.util.concurrent.Flow.Subscriber
+- java.util.concurrent.Flow.Processor
+
+Java 9 Reactive Streams는 논블로킹 비동기 스트림 프로세싱(Non-blocking Asynchronous Stream Processing)을 구현할 수 있게 도와준다.
+
+### Java 9 Reative Streams
+
+Reactive Streams는 스트림의 비동기적 처리에 관한 것임으로, Publisher와 Subscriber가 필요하다. Publisher는 데이터의 스트림을 발행하며, Subscriber는 데이터를 사용한다.
+
+Processor는 종단간의 Publisher와 Subscriber 사이의 개체를 의미하며, Publisher에게 받은 데이터를 Subscriber가 이해할 수 있도록 변환하는 역할을 한다.
+
+![ReactiveStream](./Image/ReactiveStream.png)
+
+### Java 9 Flow API
+
+Java 9 Flow APIㄴ은 Reactive Streams Specification으로 구현됐다. Flow API는 이터레이터(Iterator)와 옵저버(Observer) 패턴으 조합으로, 이터레이터는 어플리케이션이 소스로부터 항목을 가져오는 풀(Pull) 모델에서 작동되며, 옵저버는 항목이 소스에서 어플리케이션으로 항목이 푸쉬될 때 반응하며, 푸쉬(Push) 모델이서 작동된다.
+
+Java 9 Flow API에서 subscriber는 publisher에게 subscribing하는 동안 N개의 항목을 요청할 수 있다. 그럼 다음 푸쉬 할 항목이 더 이상 없거나 오류가 발생할 때까지 항목은 publisher에서 subscriber로 푸쉬된다.
+
+- java.util.concurrent.Flow
+
+  Flow API의 메인 클래스이다.
+
+- java.util.concurrent.Flow.Publisher
+
+- java.util.concurrent.Flow.Subscriber
+
+  - onSubscribe
+  - onNext
+  - onError
+  - onComplete
+
+- java.util.concurrent.Flow.Subscription
+
+  Publisher와 Subscriber 사이에서 비동기 논블로킹 링크를 생성하는데 사용된다. Subsriber는 request 메소드롤 호출함으로써 Publisher에게 특정 항목을 요구할 수 있으며, cancel 메소드를 호출함으로써 Publisher와 Subscriber 사이의 링크를 닫는 등의 구독 취소를 할 수 있다.
+
+- java.util.concurrent.Flow.Processor
+
+  Publisher와 Subscriber 사이를 확장하기 위한 인터페이스
+
+- java.util.concurrent.SubmissionPublisher
+
+  현재의 Subscriber가 연결을 닫을 때까지 비동기적으로 제출하는 Publisher 구현체이다. Executor 프레임워크를 사용한다.
+
+Subscriber: 
+
+```java
+package com.journaldev.reactive_streams;
+
+import java.util.concurrent.Flow.Subscriber;
+import java.util.concurrent.Flow.Subscription;
+
+import com.journaldev.reactive.beans.Employee;
+
+public class MySubscriber implements Subscriber<Employee> {
+
+	private Subscription subscription;
+	
+	private int counter = 0;
+	
+	@Override
+	public void onSubscribe(Subscription subscription) {
+		System.out.println("Subscribed");
+		this.subscription = subscription;
+		this.subscription.request(1); //requesting data from publisher
+		System.out.println("onSubscribe requested 1 item");
+	}
+
+	@Override
+	public void onNext(Employee item) {
+		System.out.println("Processing Employee "+item);
+		counter++;
+		this.subscription.request(1);
+	}
+
+	@Override
+	public void onError(Throwable e) {
+		System.out.println("Some error happened");
+		e.printStackTrace();
+	}
+
+	@Override
+	public void onComplete() {
+		System.out.println("All Processing Done");
+	}
+
+	public int getCounter() {
+		return counter;
+	}
+
+}
+```
+
+Publisher:
+
+```Java
+package com.journaldev.reactive_streams;
+
+import java.util.List;
+import java.util.concurrent.SubmissionPublisher;
+
+import com.journaldev.reactive.beans.Employee;
+
+public class MyReactiveApp {
+
+	public static void main(String args[]) throws InterruptedException {
+
+		// Create Publisher
+		SubmissionPublisher<Employee> publisher = new SubmissionPublisher<>();
+
+		// Register Subscriber
+		MySubscriber subs = new MySubscriber();
+		publisher.subscribe(subs);
+
+		List<Employee> emps = EmpHelper.getEmps();
+
+		// Publish items
+		System.out.println("Publishing Items to Subscriber");
+		emps.stream().forEach(i -> publisher.submit(i));
+
+		// logic to wait till processing of all messages are over
+		while (emps.size() != subs.getCounter()) {
+			Thread.sleep(10);
+		}
+		// close the Publisher
+		publisher.close();
+
+		System.out.println("Exiting the app");
+
+	}
+
+}
+```
+
+result:
+
+```Java
+Subscribed
+Publishing Items to Subscriber
+onSubscribe requested 1 item
+Processing Employee [id=1,name=Pankaj]
+Processing Employee [id=2,name=David]
+Processing Employee [id=3,name=Lisa]
+Processing Employee [id=4,name=Ram]
+Processing Employee [id=5,name=Anupam]
+Exiting the app
+All Processing Done
+```
+
+-----
+
+## 9. Diamond Operator for Anonymous Inner Class
+
+
+
+
+
+
+
+ 
+
 
 
 -----
