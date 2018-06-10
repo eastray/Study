@@ -453,13 +453,333 @@ All Processing Done
 
 ## 9. Diamond Operator for Anonymous Inner Class
 
+Java SE 7에서 새롭게 도입된 다이아몬드 오퍼레이터(Diamond Operator)는 장황하거나 중복된 코드를 피하고 가독성을 향상이키기 위해 등장했다. 그러나 Java SE 8에서 익명 내부 클래스(Anonymous Inner Class)에서 다이아몬드 오퍼레이터를 사용하는데에 몇 가지 제한 사항이 있음을 발견했고, 이를 수정하여 Java SE 9에 릴레즈 되었다.
 
+```java
+public List getEmployee (String empid) {
+	return new List(emp) { };
+}
+```
 
+위의 코드에서 사용하는 ``List``는 특정 타입의 파라미터가 없이 사용되었다.
 
+```java
+public abstract class Handler<T> {
+    
+    private T contents;
+    
+    public Handler(T contents) {
+        this.contents = contents;
+        System.out.println("Constructor for Handler with Contents: " + content.toString());
+    }
+    
+    public T getContents() {
+        return contents;
+	}
+    
+    public void setContents(T contents) {
+        this.contents = contents;
+    }
+    
+    abstract void handle();
+    
+}
+```
 
+위와 같은 추상 클래스가 있다고 가정했을 때, Java SE 8 버전에서는 아래와 같이 사용할 경우 컴파일 에러가 발생하며 ``<>`` 기호와 익명 클래스를 함께 사용할 수 없었다.
 
+```java
+Handler<Integer> intHandler = new Handler<>(10) {
+    // Anonymous Class
+}
 
+Handler<?> handler = new Handler<>("One Hundred") {
+	// Anonymous Class
+}
+```
+
+Java SE 9에서는 다이아몬드 오퍼레이션의 문제점을 보완하여 익명 내부 클래스(Anonymous Inner Class)에서 다이아몬드 오퍼레이터를 사용할 수 있게 되었고, 컴파일 에러도 발생하지 않게 되었다.
+
+```java
+public class Main {
+    public static void main (String[] args) {
+	
+        Handler<Integer> intHandler = new Handler<>(1) {
+            @Override
+            public void handle() {
+                System.out.println("handler > " + getContents());
+            }
+        };
+        
+        intHandler.handle();
+        
+        Handler<? extends Integer> intHandler1 = new Handler<>(10) {
+            @Override
+            void handle() {
+                System.out.println("handle > " + getContents());
+            }
+        };
+        
+        intHandler1.handle();
+        
+        Handler<?> handler = new Handler<>("One Hundred") {
+            @Override
+            void handle() {
+                System.out.println("handle > " + getContents());
+            }
+        };
+        
+        handler.handle();
+    }
+}
+```
+
+```
+Constructor for Handler with Contents: 1
+handle > 1
+Constructor for Handler with Contents: 10
+handle > 10
+Constructor for Handler with Contents: One Hundred
+handle > One Hundred
+```
+
+-----
+
+## 10. Optional Class Improvements
+
+Java SE 9에서는 java.utill.Oprional 클래스에 몇가지 유용한 새로운 메소드가 추가됐다. 대표적으로 Stream 메소드이다.
+
+Optional 객체에 값이 있다면, stream() 메소드는 순차적으로 값을 갖는 스트림을 반환한다. 아래의 코드와 같이 Optional 객체를 느슨하게 처리하기 위해 stream() 메소드를 추가했다.
+
+```java
+Stream<Optional> emp = getEmployee(id);
+Stream empStream = emp.flatMap(Optional::stream);
+```
+
+Optional.stream() 메소드는 Employee 객체의 Optional한 스트림을 Employee 스트림으로 변환하여 결과 코드를 느슨하게 처리 할 수 있도록 한다.
+
+NullPointerException 오류를 피하기 위해 각 객체마다 null 검사를 수행하는데 얼마나 많은 작업을 했는지 알 수 있다.
+
+java.util 패키지의 일부인 Optional 클래스는 null이 아닌 값을 포함하거나 포함하지 않는 컨테이너 객체이다.
+
+이것은 주로 많은 null 검사와 NullPointerExcoption 에러를 피하기 위해서 사용되었다. 비록 java.util 패키지의 일부이지만, Collection API 인터페이스를 구현하지 않고 아래와 같이 Object 클래스를 확장한다.
+
+``` Java
+public final class Optional<T> extends Object
+```
+
+### Java SE 8: Optional Methods
+
+Java SE 8에서는 ``ìfPresent()``, ``isPresent()``, ``orElse()`` 등의 메소드를 사용할 수 있으며, Optional 객체를 확인하고 일부 기능을 수행하는 메소드 이다. 이 메소드들은 다소 지루하며, 이를 해결하기 위해 Java SE 9에서는 다른 메소드를 도입했다.
+
+- ``ifPresent()``
+
+  ``void ifPresent(Consumer Action)``
+
+  파라미터에 값이 있다면, 값을 사용하여 주어진 동작을 수행하고 그렇지 않은 경우 아무것도 수행하지 않는다.
+
+- ``isPresent()``
+
+  ``boolean isPresent()``
+
+  값이 있는 경우 ``true``를 반환하고, 없는 경우 ``false``를 반환한다.
+
+- ``orElse()``
+
+  ``public T orElse(T others)``
+
+  값이 있는 경우 값을 반환하며, 없는 경우 다른 것(orhers)을 반환한다.
+
+```java
+import java.util.Optional;
+
+public class JavaSE8Optional {
+    public static void main (String[] args) {
+        Optional<Integer> opt1 = division(4,2);
+        opt1.ifPresent(x -> System.out.println("Optional: Result found = " + x));
+        
+        Optional<Integer> opt2 = division(4,0);
+        opt2.ifPresent(x -> System.out.println("Option2: Result found: " + x));
+        
+        System.out.println("Options: Result not found, default value = " + opt.orElse(new Integer(0)));
+        
+        if(opt2.isPresent())
+            System.out.println("Option2: Result found.");
+        else
+            System.out.println("Option2: Result not found.");
+    }
+    
+    public static Optional<Integer> division(Integer x, Integer y) {
+        if(y == 0)
+            return Optional.empty();
+        else {
+            Integer z = x / y;
+            return Optional.of(z);
+        }
+    }
+}
+```
+
+```
+Option1: Result found = 2
+Option2: Result not found, default vlaue = 0;
+Option2: Result not found.
+```
+
+### Java SE 9: Optional ifPresentOrElse() Method
+
+Java SE 9에서 추가된 ``ifPresentOrElese()`` 메소드는 기존의 ``		ifPresent()``와 ``isPresent()``, ``orElse()`` 메소드를 합쳐놓은 것이다.
+
+```java
+Optional<Integer> opt1 = Optional.of(4);
+opt1.ifPresentOrElse(x -> System.out.println("Result Found: " + x), () -> System.out.println("Not Found."));
+
+Optional<Integer> opt2 = Optional.empty();
+opt2.ifPresentOrElse(x -> System.out.println("Result Found: " + x), () -> System.out.println("Not Found");
+```
+
+``` 
+Result Found: 4
+Not Found.
+```
+
+-----
+
+## 11. Stream API Improvements
+
+Java SE 9에서 java.util.Stream 인터페이스에 4개의 새로운 메소드가 추가됐다. Stream은 인터페이스며, 새로 구현된 모든 메소드는 기본 메소드이다. 그 중 두가지 메소드인 dropWhile와 takeWhile 메소드는 매우 중요하다.
+
+스칼라 언어 또는 함수형 프로그래밍 언어가 익숙하다면 이 메소드에 대해 확실해 이해할 수 있을 것이다. takeWhile() 메소드는 특정 조건에 일치하는 경우 다음 스트림에 값을 전달하며, 일치하지 않는 경우 빈 스트림을 반환한다.
+
+```java
+Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).takeWhile(i -> i < 5).forEach(System.out::println);
+```
+
+```
+1
+2
+3
+4
+```
+
+Stream은 일련의 요소이며, 쉽게 일련의 집계 연산을 지원한다. 순차적 또는 병렬적인 방식을 지원하며, 오라클은 java.uril.stream 패키지에서 새로운 Stream API를 정의했다.
+
+Java SE 9에서는 추가적으로 유용한 4개의 메소드가 도입되었다.
+
+- dropWhile
+- takeWhile
+- iterate
+- ofNullable
+
+### Java SE 9: Stream API takeWhile() Method
+
+takeWhile() 메소드는 조건부 조건과 일치하는 가장 긴 접두어 요소를 반환한다. Predicate를 인수로 취하며, Predicate는 true 또는 false를 반환하는 부울 식이다. takeWhile() 메소드는 Ordered와 Unordered 스트림에 따라 다르게 동작한다.
+
+```java
+Stream<Integer> orderedStream = Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
+
+System.out.println("Ordered Stream: ");
+orderedStream.takeWhile(x -> x < 4).forEach(x -> System.out.println(x));
+
+Stream<Integer> unorderedStream = Stream.of(1, 2, 4, 5, 3, 6, 7, 8, 9);
+System.out.println("Unordered Stream: ");
+unorderedStream.takeWhile(x -> x < 4).forEach(x -> System.out.println(x));
+```
+
+```
+Ordered Stream: 
+1
+2
+3
+Unordered Stream:
+1
+2
+```
+
+takeWile() 메소드는 false를 반환하기 전까지 해당 값이 조건부 조건에 일치하면 다음 스트림으르 전달하기 때문에 순차적인 값을 가질 때와 순차적이지 않은 값을 가질 때의 결과가 다르다.
+
+### Java SE 9: Stream API dropWhile Method
+
+Stream API에서 dropWhile() 메소드는 takeWhile() 메소드와 반대로 Predicate와 일치하는 가진 긴 접두사 요소를 제외한 나머지 요소를 반환한다. 
+
+```java
+Stream<Integer> orderedStream = Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
+
+System.out.println("Ordered Stream: ");
+orderedStream.dropWhile(x -> x < 4).forEach(x -> System.out.println(x));
+
+Stream<Integer> unorderedStream = Stream.of(1, 2, 4, 5, 3, 6, 7, 8, 9);
+
+System.out.println("Unordered Stream:");
+unorderedStream.dropWhile(x -> x < 4).forEach(x -> System.out.println(x));
+```
+
+```
+Ordered Stream:
+4
+5
+6
+7
+8
+9
+Unordered Stream:
+4
+5
+3
+6
+7
+8
+9
+```
+
+### Java SE 9: Stream API iterate Method
+
+Stream API에서 iterate()는 initialValue(첫 번째 매개 변수)를 시작으로 Predicate(두 번째 매개 변수)와 일치하면 세 번째 매개 변수를 사용하여 다은 요소를 생성하는 요소 스트림을 반환한다.
+
+for 문과 비슷한 형식을 가졌다. 첫 번째 매개 변수는 init 값을 의미하며, 두 번째 매개 변수는 조건이고, 마지막 매개 변수는 다음 요소를 생성하는 것이다.
+
+```java
+IntStream.iterate(2, x -> x < 20, x -> x * x).forEach(Systme.out::println);
+```
+
+```
+2
+4
+16
+```
+
+```java
+IntStream.iterate(2, x -> x * x).filter(x -> x < 20).forEach(System.out::println);
+```
+
+```
+2
+4
+16
+```
+
+여기서 스트림은 요소 ``2``로 시작한 다음 ``2 < 20``이 참인 경우 값을 출력하고 다음 반복에선 ``2 * 2= 4`` 값을 증가시키며 ``4 < 20`` 조건이 참이면 값을 출력한다. 조건이 false 값을 반환할 때 까지 반복한다.
+
+ ### Java SE 9: Stream API ofNullable Method
+
+Stream API에서 ofNullable() 메소드는 단일 요소가 포함된 순차적인 스트림을 반환하고, null이 아닌 경우 빈 스트림을 반환한다.
+
+```java
+Stream<Integer> notNullStream = Stream.ofNullable(1);
+notNullStream.forEach(System.out::println);
+
+Stream<Integer> nullStream = Stream.ofNullable(null);
+nullStream.forEach(System.out::println);
+```
+
+```
+1
  
+```
+
+-----
+
+## 12. Enhanced @Deprecated annotation
 
 
 
