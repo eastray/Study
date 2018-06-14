@@ -781,6 +781,100 @@ nullStream.forEach(System.out::println);
 
 ## 12. Enhanced @Deprecated annotation
 
+Java SE 9 이전에 @Deprecated 어노테이션은 단순히 메소드가 없는 마커 인터페이스(Marker Interface)였다. 해당 어노테이션은 클래스, 필드, 메소드, 인터페이스, 생성자, enum 등의 Java API를 표시하는데 사용됐다.
+
+마커 인터페이스(Marker Interface)는 메소드를 하나도 가지지 않는 인터페이스를 말한다. 한 가지 예로, 자바에서는 객체 직렬화를 위해 Serializable이라는 인터페이스를 implements한다. 이는 단지 객체가 직렬화 대상임을 표시하는 마커(Marker)이다. 
+
+Java SE 9에서는 @Deprecated 어노테이션을 강화하여 비추천 API에 대한 자세한 정보는 제공한다. 또한 지원이 중단된 API의 응용 프로그램의 정적 사용을 분석하는 도구를 제공한다. Deprecated 인터페이스에서 제공하는 두 가지 메소드는 forRemoval와 since이다. 
+
+```
+deprecated API
+비슷한 기능을 제공하는 새로운 클래스와 메소드로 API가 재구성되고 수정된다. 가능한 경우, deprecated 메소드/클래스에 대한 참조가 제거된다. 더 이상 사용되지 않는 API를 사용하는 코드의 정확한 부분에 대한 자세한 내용은 javac 컴파일러에서 'deprecation' 매개 변수를 사용할 수 있다.
+```
+
+forRemoval 메소드는 주석으로 마킹된 요소가 다음 버전에서 제거 대상인지에 대한 여부를 나타내는 메소드이다. 기본값으로 ``false``를 반환한다. since() 메소드는 주석이 달린 요소가 더 이상 사용되지 않는 버전을 반환한다. 기본값으로 빈 문자열을 반환한다. 컴파일러는 ``deprecated`` 한 요소가 사용될 때마다 경고를 생성한다.
+
+```java
+@Deprecated(since="1.2" forRemoval = ture)
+```
+
+-----
+
+## 13. HTTP 2 Client
+
+Java SE 9에서는 HTTP/2 프로토콜과 WebSocket을 지원하는 새로운 HTTP 2 Client API를 공개했다. 기존읜 HTTP Client는 많은 이슈를 가지고 있었다. HttpURLConnection API를 새로운 HTTP Client로 대체하고 있다.
+
+- HTTP/2를 지원하지 않고, 오직 HTTP/1.1만 지원한다.
+- 많은 성능 이슈 발생
+- Blocking 모드에서만 동작한다.
+
+Java SE 9에서는 HTTP/1.1과 HTTP/2 프로토콜을 모두 지원하며, 동기(Blocking)와 비동기(Non-Blocking) 모드를 모두 지원한다. 또한 WebSocket API를 사용하여 비동기 모드를 지원한다.
+
+```java
+//	Using the HttpClient Class
+HttpClient httpClient = HttpClient.newHttpClient();
+
+//	Using the HttpClient.Builder Class
+HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2)
+    .authenticator(new Authenticator() {
+    @Override
+    protected PasswordAuthentication getPasswordAuthentication() {
+        return new passwordAuthentication("username", "password".toCharArray());
+    }
+}).build();
+
+//	GET Request Example (SynchronousGet)
+HttpClient client = HttpClient.newHttpClient();
+
+HttpRequest request = HttpRequest.newBuilder().uri(new URI("http://publicobject.com/helloworld.txt")).GET().build();
+
+HttpResponse<String> rsponse = client.send(request, HttpResponse.BodyHandler.asString());
+
+//	GET Reqeust Example (AsynchronousGet)
+HttpClient client = HttpClient.newHttpClient();
+
+HttpRequest request = HttpRequest.newBuilder().uri(new URI("https://publicobject.com/helloworld.txt")).GET().build();
+
+CompletableFuture<HttpResponse<String>> response = client.sendAsyc(request, HttpResponseBodyHandler.asString());
+
+HttpResponse<String> actualResponse = response.get(1000, TimeUnit.MINUTES);
+```
+
+동기식 GET을 요청하는 경우, 요청 빌더에 대상 URI를 제공하고 이 벌더의 요청 메소드를 GET으로 설정하여 클라이언트의 send() 메소드를 호출하여 요청을 보낸다.
+
+비동기식 GET 요청을 만드는 것은 클라이언트의 send() 메소드 대신 sendAsync() 메소드를 호출하여 주어진 요청을 비동기적으로 전송한다는 점외엔 동기식 GET 요청의 과정과 유사하다.
+
+-----
+
+## 14. Multi-Resolution Image API
+
+서로 다른 해상도의 이미지 set을 단일 다중 해상도 이미지로 캡슐화하기 위해 MultiResolutionImage라는 새로운 인터페이스를 도입했다. 다중 해상도 이미지와 관련된 API는 java.awt.image 패키지를 통해 사용할 수 있다. MultiResolutionImage는 다른 높이와 너비로 이미지 세트를 캡슐화할 수 있으며, 이를 사용하며 요구 사항을 충족시킬 수 있다.
+
+MultiResolutionImage 인터페이스의 주요 메소드는 ``getResolutionVariant()``와 ``getREsolutionVariants()``이다.
+
+- getResolutionVariant(): 이 메소드는 함수의 파라미터로 지정된 이미지의 폭과 높이에 근거하는 변수 세트로부터 java.awt.Image의 인스턴스를 반환한다. double 값이 0, 음수, 무한대 또는 숫자가 아닌 경우 ``illegalArgumentException``을 던진다.
+- gerResolutionVariants(): 이 메소드는 지정된 이미지에 사용할 수 있는 모둔 변수를 반환한다. java.awt.Image 형의 객체를 호함한 List를 반환한다.
+
+-----
+
+## 15. Miscellaneous Java 9 Features
+
+해당 세션에서는 여러가지 잡다한 Java SE 9의 새로운 기능을 소개한다. 잡다한 기능들은 다른 기능에 비해 비교적 덜 중요하지만, 유용한 기능들이다. 
+
+- GC(Garbage Collector) Improvements
+- Stack-Walking API
+- Filter Incoming Serialization Data
+- Deprecate the Applet API
+- Indify String Concatenation
+- Enhanced Method Handles
+- Java Platform Logging API and Service
+- Compact Strings
+- Parser API for Nashorn
+- Javadoc Search
+- HTML5 Javadoc
+
+새로운 버전이 도입되면서 비슷한 긴으을 제공하는 새로운 클래스와 메소드로 API가 재구성되고 수정된다. 가능한 경우, 비추천 API(deprecated API) 메소드/클래스에 대한 참조를 제거된다. 더 이상 사용되지 않는 API를 사용하는 코드의 정확한 부분에 대한 자세한 내용은 javac 컴파일러에서 ``-deprecation`` 매개 변수를 사용할 수 있다.
+
 
 
 -----
