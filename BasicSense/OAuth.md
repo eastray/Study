@@ -61,22 +61,21 @@ Implicit Grant는 JavaScript와 같은 스크립팅 언어를 사용하여 브�
 
 ## Access Token, Refresh Token
 
-```
-Access tokens are credentials used to access protected resources.  An access token is a string representing an authorization issued to the client.  The string is usually opaque to the client.  Tokens represent specific scopes and durations of access, granted by the resource owner, and enforced by the resource server and authorization server.
+### Access Token
 
-   The token may denote an identifier used to retrieve the authorization information or may self-contain the authorization information in a verifiable manner (i.e., a token string consisting of some data and a signature).  Additional authentication credentials, which are beyond the scope of this specification, may be required in order for the client to use a token.
+엑세스 토큰(Access Token)은 보호된 자원을 접근하기 위해 사용되는 자격을 증명한다. 엑세스 토큰은 클라이언트에게 발행하는 인증을 나타내는 문자열이다. 토큰은 특정 범위, 접근 기간, 자원 소유자에 의한 부여, 자원 서버와 권한 서버에 의한 강제 등을 나타낸다.
 
-   The access token provides an abstraction layer, replacing different authorization constructs (e.g., username and password) with a single token understood by the resource server.  This abstraction enables issuing access tokens more restrictive than the authorization grant used to obtain them, as well as removing the resource server's need to understand a wide range of authentication methods.
+토큰은 권한 정보를 검색하기위해 사용되는 식별자를 의미하며, 가변적인 방법으로 권한 정보를 스스로 포함할 수  있다.(ex. 특정 데이터 또는 기호구성된 토큰 문자열) 해당 스팩의 범위를 넘는 추가적인 권한 증명은 토큰을 ㅁ사용하기 위한 클라이언트을 위해서 요구될 것이다.
 
-   Access tokens can have different formats, structures, and methods of utilization (e.g., cryptographic properties) based on the resource server security requirements.  Access token attributes and the methods used to access protected resources are beyond the scope of this specification and are defined by companion specifications such
+엑세스 토큰은 자원 서버가 이해할 수 있는 단일 토큰으로 다른 권한 구조로 대체하는 추상화 레이어를 제공한다.(ex. username, password) 이 추상화는 그들을 얻기 해 사용되는 권한 부여보다 더욱 제한적으로 엑세스 토큰을 발행할 수 있을 뿐만 아니라, 다양한 인증 방법을 이해하기 위해 자원 서버의 필요성을 제거할 수 있다.
 
-```
+엑세스 토큰은 리소스 서버의 보안 요구사항을 기반으로 이용의 다른 형태, 구조, 방법(암호 속성) 등을 가질 수 있다. 엑세스 토큰 속성과 벙법은 보호된 자원을 사용할 수 있다. 
 
-```
-Refresh tokens are credentials used to obtain access tokens.  Refresh tokens are issued to the client by the authorization server and are used to obtain a new access token when the current access token becomes invalid or expires, or to obtain additional access tokens with identical or narrower scope (access tokens may have a shorter lifetime and fewer permissions than authorized by the resource owner).  Issuing a refresh token is optional at the discretion of the authorization server.  If the authorization server issues a refresh token, it is included when issuing an access token (i.e., step (D) in Figure 1).
+### Refresh Token
 
-   A refresh token is a string representing the authorization granted to the client by the resource owner.  The string is usually opaque to the client.  The token denotes an identifier used to retrieve the authorization information.  Unlike access tokens, refresh tokens are intended for use only with authorization servers and are never sent to resource servers.
-```
+리프레시 토큰은(Refresh Token)은 엑세스 토큰을 얻기위해 사용되는 자격을 증명한다. 리프레시 토큰은 권한 부여 서버로부터 클라이언트에게 발행되며, 현재 기간이 만료되거나 유효하지 않은 엑세스 토큰일 때 새로운 엑세스 토큰을 얻기 위해 사용된다. 또한 같거나 더 좁은 범위의 엑세스 토큰을 추가적으로 얻는데에 사용된다. 리프레시 토큰은 발행하는 것은 부가적이며, 권한 부여 서버의 재량이다. 만약 권한 부여 서버가 리프레시 토큰을 발행한다면, 엑세스 토큰을 발행할 때 포함되어 있다.
+
+리프레시 토큰은 자원 소유자로부터 클라이언트에게 권한을 부여하는 것을 나타내는 문자열이다. 문자열은 보통 클라이언트에게 불투명하다. 토큰은 권한 정보를 검색하는데 사용하되는 식별자를 의미한다. 엑세스 토큰과는 달리, 리프레시 토큰은 리소스 서버로 절대 보내지지 않고 오직 권한 부여 서버에서만 사용되도록 의도되었다.
 
 ![RefreshingAnExpiredAccessToken](./Image/RefreshingAnExpiredAccessToken.png)
 
