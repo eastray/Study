@@ -213,10 +213,6 @@ Java는 KeyStore라는 인터페이스를 통해 Encryption/Decryption, Digital 
 - `{sys:es.logs.cluster_name}`: 클러스터 이름으로 해석
 - `{sys:es.logs.node_name}`: 노드 이름으로 해석
 
-```
-
-```
-
 [속성별 해석](https://www.elastic.co/guide/en/elasticsearch/reference/current/logging.html#CO6-1)
 
 #### Configuring logging levels

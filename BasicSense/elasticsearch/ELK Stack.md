@@ -43,7 +43,7 @@
 
 - 200개 이상의 플러그인을 사용할 수 있으며, 자신만의 플러그인을 만들고 제공할 수 있는 유연성
 
-![Logstash](./Image/Logstash.png)
+![Logstash](../Image/Logstash.png)
 
 ### Logs ans Metrics
 
@@ -98,7 +98,7 @@
 
 모든 유형의 운영 데이터를 캡처하여 로그스테이시와 엘라스틱서치로 보내는 경량 쉽퍼(Shipper) 역할을 하는 Beats 플랫폼은 Topsbeat, Filebeat, Packetbeat, libbeat 등이 있다. 로그 파일을 경량화하여 엘라스틱서치 또는 로그스테이시로 넘겨주는 역할을 수행하며, 로그스테이스가 과부하되면 넘기는 속도를 줄여주고, 시스템 가동이 중단되거나 재부팅되어도 로그의 중단점을 기억하여 그 시점부터 재전송할 수 있다.
 
-![beats](./Image/beats.png)
+![beats](../Image/beats.png)
 
 ### Libbeat
 
@@ -112,7 +112,7 @@ Topbeat는 Linux, OS X, Windows에서 지원 가능하며, 지원 운영체제�
 
 서버에 Topbeat를 설치하면 엘라스틱서치가 설치된 중앙 지점에 주기적으로 메트릭을 전송하기 시작한다. 엘라스틱서치와 함께 키바나를 실행하는 경우에는 시스템 부하, 서버 개요, 시스템 전체 메모리 사용량 또는 CPI 사용량, 최상위 프로세스 목록, 프로세스당 메모리 사용량 또는 CPU 사용량, 디스트 사용 개요 및 디스크 사용량과 같은 위젯들을 사용하여 데이터를 시작화하고 사용자 정의 대시보드를 구성할 수 있다.
 
-![TopbeatOnKibana](./Image/TopbeatOnKibana.png)
+![TopbeatOnKibana](../Image/TopbeatOnKibana.png)
 
 ### Filebeat
 
@@ -125,7 +125,7 @@ Filebeat는 두 가지 요소로 구성되어 있으며, 지정된 파일에 이
 - harvesters: 단일 파일 내용일 읽는다. 각 harvester는 파일을 한 줄씩 읽은 다음 내용을 출력으로 보낸다. 하나의 harvester가 각 파일에 대해 시작되며, 파일 열기 및 닫기 등을 담당한다. Harvesters가 실행중인 경우 파일 디스크립터가 열린 상태로 유지되며, 파일을 읽는 동안 파일을 제거하거나 이름을 수정해도 파일 읽기는 지속된다. 이는 harvesters가 닫힐 때까지 디스크 공간을 예약하고 있다는 것을 의미한다.
 - prospectors: harvesters를 관리하고 출처를 파악하는 역할을 한다. 입력 유형이 log인 경우, 광도계는 정이된 glob 경로와 일치하는 드라이브의 모든 파일을 찾고 각 파일에 대해 harvester를 시작한다. 
 
-![FilebearOnKibana](./Image/FilebearOnKibana.png)
+![FilebearOnKibana](../Image/FilebearOnKibana.png)
 
 ### Packetbeat
 
@@ -133,7 +133,7 @@ Filebeat는 두 가지 요소로 구성되어 있으며, 지정된 파일에 이
 
 Packetbeat는 네트워크 서버 간 통신을 모니터하고, 어플리케이션에 대한 가시성을 제공한다. 네트워크 트래픽을 수동적으로 탐색(Sniffing)한다. 오픈소스이며, 새로운 프로토콜 또는 특정 환경에 국한된 프로토콜까지 지원할 수 있다. 
 
-![PacketbeatOnKivana](./Image/PacketbeatOnKivana.png)
+![PacketbeatOnKivana](../Image/PacketbeatOnKivana.png)
 
 -----
 
