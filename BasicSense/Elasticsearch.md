@@ -146,6 +146,109 @@ Enter value for [node.name]:
 #action.destructive_requires_name: true
 ```
 
+-----
+
+
+
+
+
+
+
+
+
+-----
+
+### Important Elasticsearch Configuration
+
+엘라스틱서치에는 구성이 겅의 필요하지 않으며, 제작에 들어가지 전에 고려해야할 설정이 있다.
+
+#### path.data and path.logs
+
+만일 `.zip` 또는 `tar.gz` 아카이브를 사용한다면, `data` 와 `logs`디렉토리는 `$ES_HOME` 의 서브 디렉토리여야 한다.
+
+```v
+config/elasticsearch.yml 중
+-----------------------------------------------------
+path:
+	logs: /var/log/elasticsearch
+	data: /var/data/elasticsearch
+# ----------------------------------- Paths ------------------------------------
+#
+# Path to directory where to store the data (separate multiple locations by comma):
+#
+#path.data: /path/to/data
+#
+# Path to log files:
+#
+#path.logs: /path/to/logs
+```
+
+#### cluster.name
+
+노드는 `cluster.name` 을 클러스터의 다른 모든 노드와 공유할 때만 클러스터에 참가할 수 있다.
+
+```
+# ---------------------------------- Cluster -----------------------------------
+#
+# Use a descriptive name for your cluster:
+#
+#cluster.name: my-application
+```
+
+#### node.name
+
+기본적으로, 엘라스틱서치는 노드 id로 UUID를 랜덤하게 생성한 7개의 문자를 처음으로 사용할 서이다.
+
+```
+# ------------------------------------ Node ------------------------------------
+#
+# Use a descriptive name for the node:
+#
+#node.name: node-1
+#
+# Add custom attributes to the node:
+#
+#node.attr.rack: r1
+```
+
+아래와 같이 서버의 HOSTNAME을 `node.name` 으로 설정할 수 있다.
+
+```
+node.name: ${HOSTNAME}
+```
+
+#### network.host
+
+기본적으로, 엘라스틱서치는 127.0.0.1과 같은 루프백 주소로 바인딩되며(IPv4 or IPv6), 이것은 서버에서 싱글 개발 노드로 운영되기 충분하다.
+
+다른 서버에 노드가 있는 클러스터를 형성하고 통신하기 위해서는 노드가 비 루프백 주소에 바인딩되어야 한다.
+
+```
+# ---------------------------------- Network -----------------------------------
+#
+# Set the bind address to a specific IP (IPv4 or IPv6):
+#
+#network.host: 192.168.0.1
+#
+# Set a custom port for HTTP:
+#
+#http.port: 9200
+#
+# For more information, consult the network module documentation.
+```
+
+#### Discovery Settings
+
+엘라스틱서치는 노드 간 클러스터링 및 마스터 선출을 위해 "Zen Discovery"라는 사용자 정의 검색 구현을 사용한다.
+
+프로덕션 환경으로 이동하기 전에 구성해야 하는 주용한 검색 설정이 두 가지 있다.
+
+
+
+
+
+
+
 
 
 -----
