@@ -4,6 +4,14 @@
 
 [elasticsearch 다운로드 및 설치 참조](https://www.elastic.co/guide/en/elasticsearch/reference/current/zip-targz.html#install-targz)
 
+```
+wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.3.1.tar.gz
+wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.3.1.tar.gz.sha512
+shasum -a 512 -c elasticsearch-6.3.1.tar.gz.sha512 
+tar -xzf elasticsearch-6.3.1.tar.gz
+cd elasticsearch-6.3.1/ 
+```
+
 -----
 
 ## Enable automatic creation of X-Pack indices
