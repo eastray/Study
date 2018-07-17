@@ -23,6 +23,7 @@ SLA는 공급 업체의 고객이 기대하는 서비스 수준을 정의하고 
 
 패킷비트는 데이터를 활용하고 네트워크를 통해 트래픽이 흐르는 방식을 이해하기 위해 실시간으로 해석한다.
 
+<<<<<<< HEAD
 페킷비트는 라이브러리이며, 데이터베이스부터 key-value 스토어, HTTP 및 저레벨 프로토콜까지 많은 어플리케이션 계층 프로토콜을 지원한다.
 
 ![패킷비트프로토콜](../Image/패킷비트프로토콜.png)
@@ -209,10 +210,11 @@ sudo ./packetbeat test config -e
 
 
 
+### Pick a protocol. Or Build Your Own
 
+페킷비트는 라이브러리이며, 데이터베이스부터 key-value 스토어, HTTP 및 저레벨 프로토콜까지 많은 어플리케이션 계층 프로토콜을 지원한다.
 
-
-
+-----
 
 
 
@@ -221,10 +223,6 @@ sudo ./packetbeat test config -e
 ### ref
 
 - [Packetbeat Reference](https://www.elastic.co/guide/en/beats/packetbeat/current/index.html)
-
-
-
-
 
 
 
