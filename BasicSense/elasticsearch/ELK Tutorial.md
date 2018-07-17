@@ -83,5 +83,9 @@ curl -X GET http://localhost:5601/api/status
 
 엘라시틱서치와 키바나 연결
 
+
+
+
+
 https://www.elastic.co/guide/en/kibana/current/connect-to-elasticsearch.html
 
