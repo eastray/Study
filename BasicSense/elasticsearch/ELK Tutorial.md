@@ -83,9 +83,20 @@ curl -X GET http://localhost:5601/api/status
 
 엘라시틱서치와 키바나 연결
 
+키바나를 사용하기 전에 어떤 엘라스틱서치 인덱스를 탐색할 것인지 알려주어야 한다. 키바나에 접근하면, 색인  중 하나 이상의 이름과 일치하는 색인 패턴(`index pattern`)을 정의하라는 메시지가 나온다.
 
+1. 엘라스틱서치와 키바나를 구동하고, 브라우저를 통해 키바나에 접근한다. 기본적으로 `localhost:5601` 이 기본이다. 
 
+![키바나UI](../Image/키바나UI.png)
 
+2. 하나 이상의 이름과 부합하는 엘라스틱서치 인덱스의 인덱스 패턴을 지정한다. 패턴에 별표(*, asterisk)를 포함할 수 있으며, 0 개 이상의 문자가 일치하게 하는 와일드카드로 사용할 수 있다. 
+3. `Next Step` 버튼을 클릭하면 시간 기준 비교를 수행하는 데 사용할 타임스템프를 포함하는 인덱스 필드 선택란이 있다. 키바나는 인덱스 매핑을 읽고 타임스템프가 있는 모든 필드를 나열한다. 만일 인덱스가 시간별 데이터가 없으면, `I don't want to use the Time Filter` 옵션을 선택한다. 시간 필터는 이 필드를 사용하여 시간별로 데이터를 필터링 한다. 
+4. `Create index patten` 을 클릭하여 인데스 패턴을 추가한다. 처음 추가하는 패턴의 경우 자동으로 구성이 되며, 인덱스 패턴을 추가적으로 생성하는 경우 `Management > Index Patterns` 에서 이용할 수 있다. 
 
-https://www.elastic.co/guide/en/kibana/current/connect-to-elasticsearch.html
+-----
 
+Using Kibana in a production environment
+
+Using kibana with X-Pack security
+
+https://www.elastic.co/guide/en/kibana/current/production.html
