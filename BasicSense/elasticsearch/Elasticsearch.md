@@ -451,6 +451,21 @@ node.name: ${HOSTNAME}
 
 -----
 
+6.3 버전과 6.2 버전의 차이
+
+6.3 버전부터는 X-Pack이 포함되어 있지만 6.2 버전 이하부터는 포함되어 잇지 않아 별도의 설치가 필요하다.
+
+```
+jhlee-pc:elasticsearch-6.3.1 kimdonghwi$ ./bin/elasticsearch-plugin install x-pack
+
+ERROR: this distribution of Elasticsearch contains X-Pack by default
+
+
+jhlee-pc:elasticsearch-6.2.4 kimdonghwi$ ./bin/elasticsearch-plugin install x-pack
+-> Downloading x-pack from elastic
+[====>                                            ] 10%
+```
+
 
 
 -----
