@@ -439,7 +439,7 @@ node.name: ${HOSTNAME}
 
 엘라스틱서치는 노드 간 클러스터링 및 마스터 선출을 위해 "Zen Discovery"라는 사용자 정의 검색 구현을 사용한다.
 
-프로덕션 환경으로 이동하기 전에 구성해야 하는 주용한 검색 설정이 두 가지 있다.
+프로덕션 환경으로 이동하기 전에 구성해야 하는 중요한 검색 설정이 두 가지 있다.
 
 -----
 
@@ -447,28 +447,38 @@ node.name: ${HOSTNAME}
 
 이상적으로, 엘라스틱서치는 서버에서 혼자 운영되어야 하며, 사용할 수 있는 모든 자원을 사용해야 한다. 그러기 위해서는 엘라스틱서치가 운영되면서 기본적으로 허용되는 것보다 더 많은 자원에 접근할 수 있도록 해당 운영체제의 설정이 필요하다. 
 
-
-
 -----
 
-6.3 버전과 6.2 버전의 차이
+### 6.3 버전과 6.2 버전의 차이 (X-Pack)
 
 6.3 버전부터는 X-Pack이 포함되어 있지만 6.2 버전 이하부터는 포함되어 잇지 않아 별도의 설치가 필요하다.
 
 ```
+// 6.3 Version
 jhlee-pc:elasticsearch-6.3.1 kimdonghwi$ ./bin/elasticsearch-plugin install x-pack
-
 ERROR: this distribution of Elasticsearch contains X-Pack by default
 
-
+// 6.2.4 Version
 jhlee-pc:elasticsearch-6.2.4 kimdonghwi$ ./bin/elasticsearch-plugin install x-pack
 -> Downloading x-pack from elastic
 [====>                                            ] 10%
 ```
 
-
-
 -----
+
+## Monitoring Settings in Elasticsearch
+
+기본적으로, 모니터링은 가능하지만 데이터 수집은 가능하지 않다. 데이터 수집을 위해서는 `xpack.monitoring.collection.enabled` 세팅이 필요하다. 이러한 설정은 `elasticsearch.yml` 파일에서 모니터링 설정을 구성할 수 있다.
+
+모니터링 UI에 모니터링 데이터가 표시되는 방법을 조정하려면 `kibana.yml`에서 `xpack.monitoring` 설정을 구성해야 하며, 로그스테이시에서 모니터링 데이터를 수집하는 방법을 제어하려면 `logstash.yml`에서 `xpack.monitoring`  설정을 구성해야 한다.
+
+### General Monitoring Settings
+
+`xpack.monitoring.enabled` 는 기본값이 true이며, 해당 노드에서 엘라스틱서치에 대한 엘라스틱서치 X-Pack 모니터링이 활성화된다. 데이터 수집을 활성화하기 위해서는 `xpack.monitoring.collection.enabled` 를 true로 설정해야 한다.
+
+![Xpack_Settings](../Image/Xpack_Settings.png)
+
+
 
 
 
