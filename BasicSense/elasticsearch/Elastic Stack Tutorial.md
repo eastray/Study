@@ -251,7 +251,7 @@ output {
 
 #### 로그스테이시에 이벤트를 전송하기 위한 메트릭비트 설정
 
-메트릭비트는 기본적으로 엘라스틱서치에게 이벤트를 보내도록 설정되어 잇으며, 이를 로그스테이시로 전송하기 위해서는 메트릭비트의 설정 파일 (metricbeat.yml)을 수정해야 한다. 
+메트릭비트는 기본적으로 엘라스틱서치에게 이벤트를 보내도록 설정되어 DLT으며, 이를 로그스테이시로 전송하기 위해서는 메트릭비트의 설정 파일 (metricbeat.yml)을 수정해야 한다. 
 
 ```
 #-------------------------- Elasticsearch output ------------------------------
@@ -280,13 +280,116 @@ output.elasticsearch:
   #ssl.key: "/etc/pki/client/cert.key"
 ```
 
+파일을 저장한 후 메트릭비트를 다시 시작하여 변경 사항을 적용시킨다. 로그스테이시는 비트으 입력을 읽고 엘라스틱서치로 이벤트를 인덱싱한다. 
+
+#### 필드를 통해 데이터를 추출하기 위한 필터 정의
+
+엘라스틱서치는 Grok 필터 플러그인을 지원하며, 이를통해 전체 커멘드라인 인수를 보내는 대신 명령의 경로만 보낼 수 있다. 
+
+경로 추출을 위해 로그스테이시 설정 파일(logstash.yml)의 입력과 출력 사이에 아래와 같이 Grok 필터를 추가한다.
+
+```
+filter {
+  if [system][process] {
+    if [system][process][cmdline] {
+      grok {
+        match => { 
+          "[system][process][cmdline]" => "^%{PATH:[system][process][cmdline_path]}"
+        }
+        remove_field => "[system][process][cmdline]" 
+      }
+    }
+  }
+}
+```
+
+`comline_path` 라는 필드를 통해 경로를 저장한다.
+
+`cmdline` 을 제거함으로써 엘라스틱서치에서 인덱싱되지 않는다.
+
+-----
+
+## Setting UP X-Pack
+
+```
+X-Pack은 엘라스틱서치, 키바나, 로그스테이시, 비트(Beats)에 단일 팩으로 설치됨으로써, 엘라스틱서치에 위치하는 데이터의 보안이나 키바나를 통한 로그인 화면 추가 등의 추가적인 기능을 제공한다.
+```
+
+### Installing X-Pack
+
+기본적으로 엘라스틱서치, 키바나, 로그스테이시를 설치할 때, X-Pack도 같이 설치된다.
 
 
 
+### Enabling and Disabling X-Pack Features 
+
+기본적으로 모든 기본 X-Pack 기능이 사용되며, elasticsearch.yml, kibana.yml, logstash.yml 설정 파일에서 특정 X-Pack 기능을 사용하거나 사용하지 않도록 설정할 수 있다.
+
+- xpack.graph.enabled
+- xpack.ml.enabled
+- xpack.monitoring.enabled
+- xpack.reporting.enabled
+- xpack.security.enabled
+- xpack.watcher.enabled
+
+위의 기능들을 false로 설정하면 각각의 기능을 비활성화 할 수 있다. 각각의 설정 파일에서 어떤 설정이 있는지는 아래의 링크를 참조한다.
+
+[X-Pack Settings](https://www.elastic.co/guide/en/elastic-stack-overview/6.3/xpack-settings.html)
+
+### 6.3 버전과 6.2 버전의 차이 (X-Pack)
+
+6.3 버전부터는 X-Pack이 포함되어 있지만 6.2 버전 이하부터는 포함되어 잇지 않아 별도의 설치가 필요하다.
+
+```
+// 6.3 Version
+jhlee-pc:elasticsearch-6.3.1 kimdonghwi$ ./bin/elasticsearch-plugin install x-pack
+ERROR: this distribution of Elasticsearch contains X-Pack by default
+
+// 6.2.4 Version
+jhlee-pc:elasticsearch-6.2.4 kimdonghwi$ ./bin/elasticsearch-plugin install x-pack
+-> Downloading x-pack from elastic
+[====>                                            ] 10%
+```
+
+-----
+
+## Breaking Changes
+
+특정 버전에서 다른 버전으로 어플리케이션을 마이그레이션할 때 알아야 할 변경 사항은 아래와 같다.
+
+```
+마이그레이션 (Migration)
+서버가 특정 단말과 관련된 요청을 다른 서버로 위임하는 동작.
+서버에서 특정 요청을 처리할 수 없는 상황이라 판단할 경우 다른 서버로 해당 요청을 위임.
+커넥션 마이그레이션과 트랜잭션 마이그레이션이 있다.
+
+데이터 마이그레이션 (Data Migration)
+데이터베이스의 검색 성능이 향상되도록 데이터의 사용 빈도계에 따라 데이터의 저장 곤간이나 저장 형태를 조정하는 일
+```
+
+일반적으로 마이너 버전(5.x to 5.y) 사이의 호환성을 유지하도록 노력하며, 메이저 버전간(5.x to 6.y)의 변경 사항이 있을 수 있다. 
+
+- - [참조]()
+
+[Breaking Changes](https://www.elastic.co/guide/en/elastic-stack-overview/6.3/xpack-breaking-changes.html)
+
+-----
+
+## X-Pack APIs
+
+X-Pack은 광범위한 REST API를 제공하여 기능을 관리하고 모니터링 한다.
+
+그래프 탐색 API를 사용하면 엘라스틱서치 색인에서 문서 및 용어에 대한 정보를 추출하고 요약할 수 있다. 
+
+이 API의 동작을 이해하는 가장 쉬운 방법은 그래프 UI를 사용하여 연결을 탐색하는 것이다.
+
+```
+Graph: Graph is unavailable for the current basic license. Please upgrade your license.
+```
+
+https://www.elastic.co/guide/en/elasticsearch/reference/6.3/graph-explore-api.html
 
 
-
-https://www.elastic.co/guide/en/elastic-stack-overview/6.3/get-started-elastic-stack.html#visualize-system-metrics
 
 -----
 
