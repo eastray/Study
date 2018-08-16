@@ -125,6 +125,93 @@ X-Pack은 엘라스틱서치, 키바나, 로그스테이시, 비트(Beats)에 �
 
 -----
 
+## X-Pack APIs
+
+X-Pack은 광범위한 REST API를 제공하여 기능을 관리하고 모니터링 한다.
+
+### Info API
+
+Info API는 설치된 X-Pakc 기능에 대한 일반 정보를 제공한다.
+
+`GET /_xpack`
+
+```
+curl -X GET "lcalhost:9200/_xpack?pretty"
+
+---output---
+{
+  "build" : {
+    "hash" : "053779d",
+    "date" : "2018-07-20T05:25:16.206115Z"
+  },
+  "license" : {
+    "uid" : "a1fe4b15-aee6-4fc8-aa3c-0a101a5619d0",
+    "type" : "basic",
+    "mode" : "basic",
+    "status" : "active"
+  },
+  "features" : {
+    "graph" : {
+      "description" : "Graph Data Exploration for the Elastic Stack",
+      "available" : false,
+      "enabled" : true
+    },
+    "logstash" : {
+      "description" : "Logstash management component for X-Pack",
+      "available" : false,
+      "enabled" : true
+    },
+    "ml" : {
+      "description" : "Machine Learning for the Elastic Stack",
+      "available" : false,
+      "enabled" : true,
+      "native_code_info" : {
+        "version" : "6.3.2",
+        "build_hash" : "903094f295d249"
+      }
+    },
+    "monitoring" : {
+      "description" : "Monitoring for the Elastic Stack",
+      "available" : true,
+      "enabled" : true
+    },
+    "rollup" : {
+      "description" : "Time series pre-aggregation and rollup",
+      "available" : true,
+      "enabled" : true
+    },
+    "security" : {
+      "description" : "Security for the Elastic Stack",
+      "available" : false,
+      "enabled" : true
+    },
+    "watcher" : {
+      "description" : "Alerting, Notification and Automation for the Elastic Stack",
+      "available" : false,
+      "enabled" : true
+    }
+  },
+  "tagline" : "You know, for X"
+}
+```
+
+- build: 빌드 번호와 타임스템프 제공
+- license: 현재 설치된 라이센스 정보 제공
+- features: 현재 라이센스에서 사용 할 수 있거나 사용 가능한 기능 제공
+
+사용할 수 있는 파라미터는 아래와 같다.
+
+- categories: 선택적으로 정보를 볼 수 있으며, 콤마(,)를 통해 다중 선택이 가능하다.
+  - `curl -X GET "localhost:9200/_xpack?categories=build,features&pretty"`
+- human: 속성 중 설명을 제거한다. 기본 값이 `true`이다.
+  - `curl -X GET "localhost:9200/_xpack?categories=build,features&pretty&human=false"`
+
+### 
+
+
+
+-----
+
 ### How monitoring works
 
 모니터링은 엘라스틱서치 노드, 로그스테이시 노드, 키바나 인스턴스를 통해 데이터를 모은다. 모니터링 중인 엘라스틱서치 클러스터는 전체 스택에 대한 모니터링 메트릭이 저장되는 위치를 제어한다. 기본적으로 로컬 인덱스에 저장되며, 프로덕션 환경에서는 별도의 모니터링 클러스터를 사용하는 것이 좋다. 별도의 모니터링 클러스터를 사용하면 프로덕션 클러스터가 중단해도 모니터링 데이터에 접근하는데에는 영향을 미치지 않는다. 또한 모니터링 활동이 프로덕션 클러스터의 성능에 영향을 주는 것을 방지할 수 있다.
@@ -184,6 +271,964 @@ X-Pack 보안은 클러스터를 신속하게 암호로 보호할 수 있는 독
 별도의 프로덕션 클러스터와 모니터링 클러스터가 있는 일반적인 모니터링 아키텍처는 아래와 같다.
 
 ![전형적인 모니터링 아키텍처](../Image/전형적인 모니터링 아키텍처.png)
+
+----
+
+## Elasticsearch REST API
+
+엘라스틱서치는 클러스터와의 상호 작용에 사용할 수 있는 REST API를 제공한다. 이 API를 통해 다양한 작업들을 수행할 수 있다.
+
+- 클러스터, 노드, 색인의 상태 및 통계 정보 확인
+- 클러스터, 노드, 색인의 데이터 및 메타데이터 관리
+- 색인에 대한 CRUD 및 검색 작업 수행
+- 페이징, 정렬, 필터링, 스크립팅, 집계 등의 여러 검색 작업 실행
+
+키바나의 콘솔 플러그인은 엘라스틱 서치의 REST API와 상호 작용할 수 있는 UI를 제공하며, 콘솔에는 엘라스틱서치에게 요청을 작업하는 편집기와 요청에 대한 응답을 표시하는 응답 창으로 나뉜다.
+
+콘솔은 cURL과 유사한 구문으로 명령을 이해하며, 아래의 예제는 콘솔 명령과 엘라스틱서치의 _search API의 GET 요청과 같은 의미이다.
+
+```
+GET /_search
+{
+  "query": {
+    "match_all": {}
+  }
+}
+------------------------------------------------------------------------
+curl -XGET "http://localhost:9200/_search" -d'
+{
+  "query": {
+    "match_all": {}
+  }
+}
+```
+
+-----
+
+## 인덱스 생성
+
+도큐먼트를 넣어서 인덱스를 자동으로 생성할 수 있지만, 샤드 수 또 리플리카의 수 등의 매핑 정보를 지정(엘라스틱서치에서 사용하는 스키마) 할 수 있다. 인덱스의 매핑 정보를 지정할 때는 아래와 같이 별도로 생성해 주어야 한다.
+
+```
+PUT library
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  }
+}
+
+PUT work
+{
+  "settings": {
+    "number_of_shards": 5, 
+    "number_of_replicas": 1
+  }
+}
+```
+
+-----
+
+## 인덱스 검색
+
+생성한 인덱스를 아래와 같이 검색할 수 있다. 여기서 match_all은 모든 인덱스를 검색할 때 사용하는 쿼리로, 검색의 기본 값이다. 별도의 스코어 계산을 하지 않는다.
+
+```
+GET library/_search
+{
+  "query": {
+    "match_all": {}
+  }
+}
+--- output---
+{
+  "took": 0,
+  "timed_out": false,
+  "_shards": {
+    "total": 1,
+    "successful": 1,
+    "skipped": 0,
+    "failed": 0
+  },
+  "hits": {
+    "total": 0,
+    "max_score": null,
+    "hits": []
+  }
+}
+
+------
+
+GET work/_search
+{
+  "query": {
+    "match_all": {}
+  }
+}
+
+--- output ---
+{
+  "took": 2,
+  "timed_out": false,
+  "_shards": {
+    "total": 5,
+    "successful": 5,
+    "skipped": 0,
+    "failed": 0
+  },
+  "hits": {
+    "total": 1,
+    "max_score": 1,
+    "hits": [
+      {
+        "_index": "work",
+        "_type": "books",
+        "_id": "PI3pO2UBUQBeYSwbzDVR",
+        "_score": 1,
+        "_source": {
+          "query": {
+            "match_all": {}
+          }
+        }
+      }
+    ]
+  }
+}
+```
+
+-----
+
+## Bulk 색인
+
+대량의 도큐먼트를 색인할 때 사용하는 api로, 색인 생성 속도가 빨라질 수 있다. 엔드 포인트는 /_bulk 이어야 하며, 다음 줄에서 JSON 구조의 필드가 필요하다.
+
+```
+POST library/books/_bulk
+{"index": {"_id": 1}}
+{"title": "The quick brow fox", "price": 5, "colors":["red", "green", "blue"]}
+{"index":{"_id": 2}}
+{"title":"The quick brow fox jumps over the lazy dog", "price": 15, "colors":["blue", "yellow"]}
+{"index":{"_id": 3}}
+{"title":"The quick brow fox jumps over the quick dog", "price": 8, "colors":["red", "blue"]}
+{"index":{"_id": 4}}
+{"title":"brow fox brown dog", "price": 2, "colors":["black", "yellow", "red", "blue"]}
+{"index":{"_id": 5}}
+{"title":"Lazy dog", "price": 9, "colors":["red", "blue", "green"]}
+```
+
+## 개별 도큐멘트 조회
+
+```
+GET library/books/1
+{
+  "_index": "library",
+  "_type": "books",
+  "_id": "1",
+  "_version": 1,
+  "found": true,
+  "_source": {
+    "title": "The quick brow fox",
+    "price": 5,
+    "colors": [
+      "red",
+      "green",
+      "blue"
+    ]
+  }
+}
+```
+
+-----
+
+## 매핑 정보 검색
+
+인덱스 또는 인덱스 / 타입에 대한 매핑 정의를 검색할 수 있다. 키워드 타입은 어그리케이션에서 사용된다. 
+
+```
+GET library/_mapping
+
+--- output ---
+{
+  "library": {
+    "mappings": {
+      "books": {
+        "properties": {
+          "colors": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "price": {
+            "type": "long"
+          },
+          "title": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+## 특정 단어가 포함된 도큐먼트 검색
+
+```
+GET library/_search
+{
+  "query": {
+    "match": {
+      "title": "fox"
+    }
+  }
+}
+
+--- output ---
+{
+  "took": 23,
+  "timed_out": false,
+  "_shards": {
+    "total": 1,
+    "successful": 1,
+    "skipped": 0,
+    "failed": 0
+  },
+  "hits": {
+    "total": 4,
+    "max_score": 0.32575765,
+    "hits": [
+      {
+        "_index": "library",
+        "_type": "books",
+        "_id": "1",
+        "_score": 0.32575765,
+        "_source": {
+          "title": "The quick brow fox",
+          "price": 5,
+          "colors": [
+            "red",
+            "green",
+            "blue"
+          ]
+        }
+      },
+      {
+        "_index": "library",
+        "_type": "books",
+        "_id": "4",
+        "_score": 0.32575765,
+        "_source": {
+          "title": "brow fox brown dog",
+          "price": 2,
+          "colors": [
+            "black",
+            "yellow",
+            "red",
+            "blue"
+          ]
+        }
+      },
+      {
+        "_index": "library",
+        "_type": "books",
+        "_id": "2",
+        "_score": 0.23044494,
+        "_source": {
+          "title": "The quick brow fox jumps over the lazy dog",
+          "price": 15,
+          "colors": [
+            "blue",
+            "yellow"
+          ]
+        }
+      },
+      {
+        "_index": "library",
+        "_type": "books",
+        "_id": "3",
+        "_score": 0.23044494,
+        "_source": {
+          "title": "The quick brow fox jumps over the quick dog",
+          "price": 8,
+          "colors": [
+            "red",
+            "blue"
+          ]
+        }
+      }
+    ]
+  }
+}
+```
+
+기본적으로 `match` 쿼리를 사용하여 검색할 수 있으며, 띄어쓰기를 통해 `or` 검색이 가능하다.
+
+```
+GET library/_search
+{
+  "query": {
+    "match": {
+      "title": "quick dog"
+    }
+  }
+}
+
+--- output ---
+{
+  "took": 3,
+  "timed_out": false,
+  "_shards": {
+    "total": 1,
+    "successful": 1,
+    "skipped": 0,
+    "failed": 0
+  },
+  "hits": {
+    "total": 5,
+    "max_score": 0.8634703,
+    "hits": [
+      {
+        "_index": "library",
+        "_type": "books",
+        "_id": "3",
+        "_score": 0.8634703,
+        "_source": {
+          "title": "The quick brow fox jumps over the quick dog",
+          "price": 8,
+          "colors": [
+            "red",
+            "blue"
+          ]
+        }
+      },
+      {
+        "_index": "library",
+        "_type": "books",
+        "_id": "2",
+        "_score": 0.66220284,
+        "_source": {
+          "title": "The quick brow fox jumps over the lazy dog",
+          "price": 15,
+          "colors": [
+            "blue",
+            "yellow"
+          ]
+        }
+      },
+      {
+        "_index": "library",
+        "_type": "books",
+        "_id": "1",
+        "_score": 0.6103343,
+        "_source": {
+          "title": "The quick brow fox",
+          "price": 5,
+          "colors": [
+            "red",
+            "green",
+            "blue"
+          ]
+        }
+      },
+      {
+        "_index": "library",
+        "_type": "books",
+        "_id": "5",
+        "_score": 0.39033517,
+        "_source": {
+          "title": "Lazy dog",
+          "price": 9,
+          "colors": [
+            "red",
+            "blue",
+            "green"
+          ]
+        }
+      },
+      {
+        "_index": "library",
+        "_type": "books",
+        "_id": "4",
+        "_score": 0.32575765,
+        "_source": {
+          "title": "brow fox brown dog",
+          "price": 2,
+          "colors": [
+            "black",
+            "yellow",
+            "red",
+            "blue"
+          ]
+        }
+      }
+    ]
+  }
+}
+```
+
+특정 단어가 들어간 도큐멘트가 모두 검색되며, `_score` 값을 보면 모두 값이 상이하다. 검색하고자 하는 특정 단어가 가지고 있는 도큐멘트와 더 많이 부합할 경우, `_score` 의 점수가 올라가며 검색에서 맨 위에 나오게 된다. 
+
+특정 단어가 아닌 정확한 구문이 포함된 도큐멘트를 검색하는 경우 `match_phrase` 쿼리를 사용한다.
+
+```
+GET library/_search
+{
+  "query": {
+    "match_phrase": {
+      "title": "quick dog"
+    }
+  }
+}
+
+--- output ---
+{
+  "took": 15,
+  "timed_out": false,
+  "_shards": {
+    "total": 1,
+    "successful": 1,
+    "skipped": 0,
+    "failed": 0
+  },
+  "hits": {
+    "total": 1,
+    "max_score": 0.6622029,
+    "hits": [
+      {
+        "_index": "library",
+        "_type": "books",
+        "_id": "3",
+        "_score": 0.6622029,
+        "_source": {
+          "title": "The quick brow fox jumps over the quick dog",
+          "price": 8,
+          "colors": [
+            "red",
+            "blue"
+          ]
+        }
+      }
+    ]
+  }
+}
+```
+
+엘라스틱서치에서는 relevance (정확도) 알고리즘을 사용하며, 이를 이용한 랭킹을 적용할 수 있다. 랭킹은 스코어를 기반으로 정렬되며, 엘라스틱서치에서는 랭킹 알고리즘이 중요하며, 일반적으로 Term Frequency(TF)와 Inverse Document Frequency(IDF)를 많이 사용한다.
+
+- Term Frequency: 찾는 검색어가 문서에 많을 수록 해당 문서의 정확도를 높인다.
+- Inverse Document Frequency: 전체 문서에서 많이 출현한 단어일수록 점수가 낮다.
+
+-----
+
+## bool 쿼리
+
+bool 쿼리를 통해 다른 쿼리를 사용할 수 있으며, must, should, must_not을 제공한다.
+
+- must : and 조건으로 must에 있는 것 사용
+- must_not: 포함하지 않는 문서 검색
+- should: 기본적인 개념은 or 조건과 비슷하나, 매칭되면 더 높은 스코어가 부여된다 가중치 조걸이 가능하며 "boost" 를 톨해 가중치를 조정할 수 있다.
+
+```
+GET library/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "title": "quick"
+          }
+        },
+        {
+          "match_phrase": {
+            "title": "lazy dog"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+```
+GET library/_search
+{
+  "query": {
+    "bool": {
+      "must_not": [
+        {
+          "match": {
+            "title": "lazy"
+          }
+        },
+        {
+          "match_phrase": {
+            "title": "quick dog"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+```
+GET library/_search
+{
+  "query": {
+    "bool": {
+      "should": [
+        {
+          "match_phrase": {
+            "title": "quick dog"
+          }
+        },
+        {
+          "match_phrase": {
+            "title": {
+              "query": "lazy dog",
+              "boost": 3
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+### must와 should를 복합 사용
+
+우선순위는 must가 먼저, should는 매칭될 필요는 없지만 가중치를 조절할 수 있다.
+
+```
+GET library/_search
+{
+  "query": {
+    "bool": {
+      "should": [
+        {
+          "match": {
+            "title": "lazy"
+          }
+        }
+      ],
+      "must": [
+        {
+          "match": {
+            "title": "dog"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+결과는 기본적으로 must를 통해 특정 단어가 항상 들어가 있으며, 그중 should를 통해 지정한 단어가 들어간 도큐멘트의 경우 가중치를 높인다.
+
+-----
+
+## Highlight
+
+검색 값이 크고 여러 필드를 사용하는 경우 유용하다.
+
+```
+GET /library/_search
+{
+  "query": {
+    "bool": {
+      "should": [
+        {
+            "match_phrase": {
+            "title": {
+              "query": "quick dog",
+              "boost": 2
+            }
+          }
+        },
+        {
+          "match_phrase": {
+            "title": "lazy dog"
+          }
+        }
+      ]
+    }
+  },
+  "highlight": {
+    "fields": {
+      "title": {}
+    }
+  }
+}
+```
+
+-----
+
+## filter
+
+특정 필드에서 지정한 텀이 들어있는 문서와 매치된다. 여기서 텀은 각각의 고유한 검색어를 가리키는 용어이다. 스코거 계산 없이 캐싱되며, 속도가 빠르다.
+
+필터의 경우 bool 조건이 해당할 경우에만 사용된다. (must + filter)
+
+```
+GET /library/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "title": "dog"
+          }
+        }
+      ],
+      "filter": {
+        "range": {
+          "price": {
+            "gte": 5,
+            "lte": 10
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+특정 단어를 가지며, 문서의 요소 중 5 보다 크고 10보다 작은 도큐멘트를 가져온다.
+
+### 필터만 사용하고 스코어가 필요없는 경우
+
+```
+GET library/_search
+{
+  "query": {
+    "bool": {
+      "filter": {
+        "range": {
+          "price": {
+            "gt": 8
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+gt는 초과를 의미하며, gte는 이상을 의미한다.
+
+## Analysis(_analyze)
+
+텍스트 필드를 가공하여 검색에 사용할 수 잇는 값으로 바꾸어 준다.
+
+```
+GET library/_analyze
+{
+  "tokenizer": "standard",
+  "text": "Brown fox brown dog"
+}
+```
+
+분석 과정은 토크나이저()와 토큰 필터로 구성되며, 토크나이저는 데이터를 분리하는 역할을 하며 이렇게 나누어진 단어를 텀(term)이라 한다. 토큰 필터는 텀들을 특정 조건으로 재가공되는 과정이다. 
+
+```
+GET library/_analyze
+{
+  "tokenizer": "standard",
+  "filter": ["lowercase"], 
+  "text": "Brown fox brown dog"
+}
+```
+
+lowecase: 소문자로 변경
+
+unique: 중복되는 텀을 제거
+
+
+
+토크나이저와 필터 대신 아날라이저를 사용할 수 있다. 아날라이저는 토크나이저와 필터를 합쳐서 저장이 가능하며, 인덱스에 저장하여 사용할 수 있다. 기본적으로 엘라스틱서치에서 제공하는 에널라이저가 있다.
+
+```
+GET library/_analyze
+{
+  "analyzer": "standard",
+  "text": "Brown fox brown dog"
+}
+```
+
+
+
+복합적인 문장을 분석하는 경우
+
+qhrgkqwjrdls answkddmf anstj
+
+```
+GET library/_analyze
+{
+  "tokenizer": "standard",
+  "filter": ["lowercase"],
+  "text": "THE quick.brown_FOx jumped! $19.95 @ 3.0"
+}
+```
+
+```
+GET library/_analyze
+{
+  "tokenizer": "letter",
+  "filter": ["lowercase"],
+  "text": "THE quick.brown_FOx jumped! $19.95 @ 3.0"
+}
+```
+
+letter 토크나이저는 의미가 있는 단어들로만 분리를 한다. 알파벳만 허용한다.
+
+## 어그리게이션 (Aggregation, 집계)
+
+도크멘트의 키워드 필트 값을 기본적으로 사용한다. 쿼리랑 같은 레벨에서 사용 가능하며, 쿼리와 같이 사용할 수 있다.
+
+```
+GET library/_search
+{
+  "size": 0,
+  "aggs": {
+    "popular-colors": {
+      "terms": {
+        "field": "colors.keyword"
+      }
+    }
+  }
+}
+```
+
+1차적으로 쿼리를 먼저 실행하며, 그 결과 범위에서 집계를 시행한다.
+
+```
+GET library/_search
+{
+  "query": {
+    "match": {
+      "title": "dog"
+    }
+  },
+  "aggs": {
+    "popular-colors": {
+      "terms": {
+        "field": "colors.keyword"
+      }
+    }
+  }
+}
+```
+
+어그리케이션은 여러 개를 사용하며 sub-aggs를 사용한다.
+
+```
+GET library/_search
+{
+  "size": 0,
+  "aggs": {
+    "price-statistics": {
+      "stats": {
+        "field": "price"
+      }
+    },
+    "popular-colors": {
+      "terms": {
+        "field": "colors.keyword"
+      },
+      "aggs": {
+        "avg-price-per-color": {
+          "avg": {
+            "field": "price"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+## 도큐멘트 업데이트
+
+기존 데이터를 대체할 수 있다.
+
+```
+POST library/books/1
+{
+  "title": "The quick brow fox",
+  "price": 10,
+  "colors": ["red", "green", "blue"]
+}
+```
+
+_update api를 이용할 수 있다.
+
+```
+POST library/books/1/_update
+{
+  "doc": {
+    "title": "The quick fantastic fox"
+  }
+}
+```
+
+업데이트시 버전(_version)의 값이 올라간다.
+
+
+
+## 매핑
+
+들어온 데이터를 확인하면서 값의 필드를 알아서 판단한다. 임의의 패핑을 지정하고자 하는경우 사용된다. 
+
+세팅과 매핑으로 나누어 지며, 세팅에는 인덱스의 설정값이 담긴다.
+
+이미 만들어 놓은 인덱스는 수정할 수 없으며, 인덱스 전부 삭제 후 다시 생성해야 한다.
+
+```
+PUT famous-librarians
+{
+  "settings": {
+    "number_of_replicas": 0,
+    "number_of_shards": 2,
+    "analysis": {
+      "analyzer": {
+        "my-analyzer": {
+          "type": "custom",
+          "tokenizer": "uax_url_email",
+          "filter": [
+            "lowercase"
+            ]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "librarian": {
+      "properties": {
+        "name": {
+          "type": "text"
+        },
+        "favourite-colors": {
+          "type": "keyword"
+        },
+        "birth-date": {
+          "type": "date",
+          "format": "year_month_day"
+        },
+        "hometown": {
+          "type": "geo_point"
+        },
+        "description": {
+          "type": "text",
+          "analyzer": "my-analyzer"
+        }
+      }
+    }
+  }
+}
+```
+
+
+
+아래와 같이 값을 넣을 수 있다.
+
+```
+PUT famous-librarians/librarian/1
+{
+  "name": "Fernando Chiwoo",
+  "favourite-colors": ["Yellow", "light-gret"],
+  "birth-date": "1990-05-10",
+  "hometown": {
+    "lat": 33.333333,
+    "lon": 55.555555
+  },
+  "description": "This example is example for Elasticsearch Tutorial"
+}
+```
+
+
+
+쿼리를 통해 생성한 도큐메트를 검색할 수 잇다.
+
+```
+GET famous-librarians/_search
+{
+  "query": {
+    "query_string": {
+      "fields": ["favourite-colors"],
+      "query": "yellow or black"
+    }
+  }
+}
+```
+
+
+
+range를 통해 범위를 지정할 수 있으며, now 키워드를 지원한다.
+
+```
+GET famous-librarians/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match_all": {}
+        }
+      ],
+      "filter": {
+        "range": {
+          "birth-date": {
+            "gte": "now-200y",
+            "lte": "2000-01-01"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+geo-point로도 범위를 지정할 수 있다. 위치 정보와 관련된 검색들도 가능하다.
+
+```
+GET famous-librarians/_search
+{
+  "query": {
+    "bool": {
+      "filter": {
+        "geo_distance": {
+          "distance": "100km",
+          "FIELD": {
+            "lat": 40.73,
+            "lon": -74.1
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+
+
+
+
+
+
+
 
 
 

@@ -1,12 +1,10 @@
 # Nginx
 
-
-
 엔진엑스(Nginx)는 이고르 시쇼브(Igor Sysoev, 러시아 출신)에 의해 개발된 동시 접속 처리에 특화된 웹 서버 프로그램이다. 기존의 Apache 보다 동작이 단순하며, 전달자 역할을 통해 동시 접속 처리에 강점을 보인다. 동시 접속자가 대략 700명 이상의 경우, 서버를 증설하거나 Nginx 환경을 권장한다.
 
 ## Nginx(웹 서버)의 역할
 
-- 정적 파일을 처리하는 HTTP 서버로서의 역할: 웹 서버의 역할은 HTML, CSS, Javascript, 이미지와 같은 정보를 웹 브라우저(Chrome, Iexplore, Opera, Firefox 등)에 전송하는 역할을 한다.
+- 정적 파일을 처리하는 HTTP 서버로서의 역할: 웹 서버의 역할은 HTML, CSS, Javascript, 이미지와 같은 정보를 웹 브라우저(Chrome, explore, Opera, Firefox 등)에 전송하는 역할을 한다.
 
 ![Nginx](./Image/Nginx.png)
 
