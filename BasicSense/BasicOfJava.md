@@ -23,7 +23,6 @@
 - Exception
 - Ref
 
-
 -----
 
 ## JVM (Java Virtual Machine)
@@ -51,7 +50,9 @@ JVM의 클래스 로더(Class Loader), 실행 엔진(Execution Engine), 런타�
 
   JVM이 프로그램을 수행하기 위해 OS로부터 할당받은 메모리 영역이며, 크게 5 가지 영역으로 구성된다.
 
-  ![RuntimeDataArea](./imege/RuntimeDataArea.png)
+  ![RuntimeDataArea](/Users/kimdonghwi/Documents/Personal/Study/BasicSense/Image/RuntimeDataArea.png)
+
+  
 
   - PC Register
 
@@ -107,7 +108,6 @@ JVM의 전체적인 흐름은 아래와 같다.
 - 로딩된 자바 바이트 코드(.class) 파일은 실행 엔진 (Execution Engine)을 통해 해석된다.
 - 해석된 바이트 코드는 Runtime Data Areas 영역에 배치되어 실질적인 수행이 이루어진다.
 - 이러한 과정 속에서 JVM은 주기적으로 Thread Synchronization과 Garbage Collection과 같은 관리 작업을 수행한다.
-
 
 -----
 
@@ -230,7 +230,6 @@ JVM의 전체적인 흐름은 아래와 같다.
   ```
 
   결론적으로, StringBuffer 클래스는 문자열을 추가하기 위해 append()와 같은 메소드를 사용할 때 String 클래스보다 뛰어난 성능을 보이지만, StringBuffer 객체의 생성과 toString() 메소드를 통한 String 객체의 생성이 반드시 필요하므로 더 많은 시간과 메모리 자원의 낭비를 초례한다. 또한 String의 + 연산자는 횟수가 많아지면 성능이 급격히 떨어지며, 문자열을 수정하는 연산이 많은 경우 StringBuffer를 사용하는 것이 좋다. 또한 멀티 스레드 환경에서 동기화를 고려하지 않는다면 StringBuilder를, 멀티 스레드 환경에서 동기화를 고려한다면 StringBuffer를 사용하는 것이 좋다.
-
 
 -----
 
