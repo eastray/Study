@@ -18,13 +18,13 @@ Circuit Breaker의 기본적인 개념은 failure를 모니터링하는 Circuit 
 
 서비스 호출 중간, 즉 Service A와 Service B 사이에 Circuit Breaker를 설치하여 Service B로의 모든 호출이 Circuit Breaker를 통하게 되고, Service B가 정상적인 상황에서는 트래픽을 문제없이 통과시킨다.
 
-![CircuitBreakerPattern(ByPass)](/Users/kimdonghwi/Documents/Personal/Study/BasicSense/Image/CircuitBreakerPattern(ByPass).png)
+![CircuitBreakerPattern(ByPass)](./Image/CircuitBreakerPattern(ByPass).png)
 
 Service B와의 통신에서 문제가 발생하게 되는 경우, Circuit Breaker가 이를 감지하여 Service B로의 호출을 강제적으로 끊어 Service A의 스레드가 더 이상 응답을 기다리지 않도록하여 장애가 전파되는 것을 방지한다. 강제적으로 호출을 끊으면 에러 메시지가 Service A에서 발생하기 때문에 장애 전파는 막을 수 있지만, Service A에서 별도의 장애 처리 로직이 필요하다.
 
 이를 발전 시킨 형태가 Fall-back Messaging이며, Circuit Breaker에서 Service B가 정상적인 응답을 할 수 없을 때, Circuit Breaker가 룰에 따라 다른 메시지를 리턴하는 방식이다. 
 
-![CircuitBreakerPattern(Fallback)](/Users/kimdonghwi/Documents/Personal/Study/BasicSense/Image/CircuitBreakerPattern(Fallback).png)
+![CircuitBreakerPattern(Fallback)](./Image/CircuitBreakerPattern(Fallback).png)
 
 ```
 example.
