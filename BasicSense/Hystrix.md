@@ -82,7 +82,7 @@ The window is divided into buckets and “rolls” by these increments.
 
 창은 이러한 증분에 따라 양동이와 "롤"로 나뉩니다.
 
-![스크린샷 2018-09-05 오전 10.21.13](/Users/kimdonghwi/Desktop/스크린샷 2018-09-05 오전 10.21.13.png)
+![버켓](./Image/버켓.png)
 
 ### example
 
