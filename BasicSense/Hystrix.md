@@ -4,7 +4,7 @@ Netfix에서 Circuit Breaker Pattern을 구현한 라이브러리이다.
 
 -----
 
-## Circuit Breaker (by. Martin Fopwler)
+## Circuit Breaker (by. Martin Fowler)
 
 일반적으로 스프트웨어 시스템에서는 각기 다른 프로세스들에서 동작하는 소프트웨어를 원격 호출하도록 한다. 메모리 상에서의 호출과 원격 호출의 차이점 중 하나는, 원격 호출의 경우 fail이 일어날 수 있거나 어떤 타임아웃 제한에 다다를때 까지 응답을 주지않고 [Hang](#hang)이 걸릴 수 있다는 것이다. 이 문제는 응답이 없는 supplier에 많은 호출자가 묶인다면, 중요 자원의 고갈로 인해 여러 시스템에 거쳐 연쇄 Failure를 일으킬 수 있다. 이러한 치명적인 연쇄 Failure를 방지하기 위해 Circuit Breaker Pattern이 대중화 되었다.
 
@@ -36,6 +36,73 @@ Service A가 상품 목록을 화면에 뿌려주는 서비스이고, Service B�
 
 -----
 
+
+
+#### circuitBreaker.requestVolumeThreshold
+
+```
+This property sets the minimum number of requests in a rolling window that will trip the circuit.
+
+For example, if the value is 20, then if only 19 requests are received in the rolling window (say a window of 10 seconds) the circuit will not trip open even if all 19 failed.
+```
+
+이 속성은 회로를 트립 할 롤링 윈도우의 최소 요청 수를 설정합니다.
+
+예를 들어, 값이 20 인 경우 롤링 창 (예 : 10 초)에서 19 개의 요청 만 수신 된 경우 모두 19 개가 실패하더라도 회로가 열리지 않습니다.
+
+#### circuitBreaker.sleepWindowInMilliseconds
+
+```
+This property sets the amount of time, after tripping the circuit, to reject requests before allowing attempts again to determine if the circuit should again be closed.
+```
+
+이 속성은 회로를 트립 한 후 회로를 다시 닫아야하는지 다시 결정하기 전에 요청을 거부하도록 시간을 설정합니다.
+
+#### circuitBreaker.errorThresholdPercentage
+
+```
+This property sets the error percentage at or above which the circuit should trip open and start short-circuiting requests to fallback logic.
+```
+
+이 속성은 오류 발생률을 회로가 열리는 이상으로 설정하고 단락 요청을 대체 논리로 시작합니다.
+
+#### metrics.rollingStats.timeInMilliseconds
+
+```
+This property sets the duration of the statistical rolling window, in milliseconds. This is how long Hystrix keeps metrics for the circuit breaker to use and for publishing.
+
+As of 1.4.12, this property affects the initial metrics creation only, and adjustments made to this property after startup will not take effect. This avoids metrics data loss, and allows optimizations to metrics gathering.
+
+The window is divided into buckets and “rolls” by these increments.
+```
+
+이 속성은 통계 롤링 창의 기간을 밀리 초 단위로 설정합니다. 이것은 Hystrix가 회로 차단기가 사용하고 게시하기위한 측정 기준을 얼마나 오래 유지하는지입니다.
+
+1.4.12부터이 속성은 초기 메트릭 생성에만 영향을 주며 시작 후이 속성에 대한 조정은 적용되지 않습니다. 이렇게하면 메트릭 데이터 손실을 방지하고 메트릭 수집을 최적화 할 수 있습니다.
+
+창은 이러한 증분에 따라 양동이와 "롤"로 나뉩니다.
+
+![스크린샷 2018-09-05 오전 10.21.13](/Users/kimdonghwi/Desktop/스크린샷 2018-09-05 오전 10.21.13.png)
+
+### example
+
+```
+@HystrixCommand(fallbackMethod = "thresholdTest2",
+            commandProperties = {
+            @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "3"),
+            @HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "50000"),
+            @HystrixProperty(name = "metrics.rollingStats.timeInMilliseconds", value = "10000")
+    })
+```
+
+오류 감시 시간 10초 내에, 3번 이상의 요청이 있었고, 그 요청 중 오류율이 50% 이상일 경우 Circuit Breaker가 작동하여 fallback 메소드가 호출된다. Circuit Breaker는 50초 동안 동작하며, 50초 이후 원래 로직 흐름으로 돌아간다.
+
+오류 감시 시간 내에 요청이 반드시 3번 이상이어야 하며, 2번의 요청만 들어오고 2번의 요청 모두 실패하고 감시 기간 10초가 지나게 되면 Circuit Breaker는 작동하지 않는다.
+
+
+
+-----
+
 ## Hang
 
 컴퓨팅에서 컴퓨터 프로그램이나 시스템이 입력에 응답하지 않을 때 정지(hang || freeze)가 발생한다. 
@@ -53,4 +120,8 @@ hang에는 무한 루프, 장시간 중단할 수 없는 컴퓨팅, 자원 고�
 - [Netflix-How it Works](https://github.com/Netflix/Hystrix/wiki/How-it-Works)
 - [Circuit Breaker](https://spring.io/guides/gs/circuit-breaker/)
 - [javadoc-netflix-hystrix](http://netflix.github.io/Hystrix/javadoc/)
+- [1](https://medium.com/@goinhacker/hystrix-500452f4fae2)
+- [2](https://github.com/spring-projects/spring-cloud/wiki/Spring-Cloud-Edgware-Release-Notes)
+- [3](https://supawer0728.github.io/2018/03/11/Spring-Cloud-Hystrix/)
+- [4](https://spring.io/guides/gs/circuit-breaker/)
 
