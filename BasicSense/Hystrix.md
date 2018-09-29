@@ -2,6 +2,13 @@
 
 Netfix에서 Circuit Breaker Pattern을 구현한 라이브러리이다. 
 
+기능적 관점에서 본 Hystrix 주요 기능 4가지
+
+- Circuit Breaker
+- Fallback
+- Thread Isolation
+- Timeout
+
 -----
 
 ## Circuit Breaker (by. Martin Fowler)
@@ -99,7 +106,7 @@ The window is divided into buckets and “rolls” by these increments.
 
 오류 감시 시간 내에 요청이 반드시 3번 이상이어야 하며, 2번의 요청만 들어오고 2번의 요청 모두 실패하고 감시 기간 10초가 지나게 되면 Circuit Breaker는 작동하지 않는다.
 
-
+일정 시간 경과 후에 단 한개의 요청에 대해 호출을 허용하며(Half Open), 해당 호출이 성공하면 Circuit이 Close 된다.
 
 -----
 
@@ -120,6 +127,7 @@ hang에는 무한 루프, 장시간 중단할 수 없는 컴퓨팅, 자원 고�
 - [Netflix-How it Works](https://github.com/Netflix/Hystrix/wiki/How-it-Works)
 - [Circuit Breaker](https://spring.io/guides/gs/circuit-breaker/)
 - [javadoc-netflix-hystrix](http://netflix.github.io/Hystrix/javadoc/)
+- [Spring Camp 2018 : 11번가 Spring Cloud 기반 MSA로의 전환 – 지난 1년간의 이야기](https://readme.skplanet.com/?p=13933)
 - [1](https://medium.com/@goinhacker/hystrix-500452f4fae2)
 - [2](https://github.com/spring-projects/spring-cloud/wiki/Spring-Cloud-Edgware-Release-Notes)
 - [3](https://supawer0728.github.io/2018/03/11/Spring-Cloud-Hystrix/)
