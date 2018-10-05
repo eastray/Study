@@ -1,8 +1,8 @@
-# Hystrix
+# 0Hystrix
 
 Netfix에서 Circuit Breaker Pattern을 구현한 라이브러리이다. 
 
-기능적 관점에서 본 Hystrix 주요 기능 4가지
+기능적 관점에서 본 Hystrix 주요 기능 4가지
 
 - Circuit Breaker
 - Fallback
@@ -53,9 +53,9 @@ This property sets the minimum number of requests in a rolling window that will 
 For example, if the value is 20, then if only 19 requests are received in the rolling window (say a window of 10 seconds) the circuit will not trip open even if all 19 failed.
 ```
 
-이 속성은 회로를 트립 할 롤링 윈도우의 최소 요청 수를 설정합니다.
+이 속성은 회로를 트립 할 롤링 윈도우의 최소 요청 수를 설정한다.
 
-예를 들어, 값이 20 인 경우 롤링 창 (예 : 10 초)에서 19 개의 요청 만 수신 된 경우 모두 19 개가 실패하더라도 회로가 열리지 않습니다.
+예를 들어, 값이 20 인 경우 롤링 창 (예 : 10 초)에서 19 개의 요청 만 수신 된 경우 모두 19 개가 실패하더라도 회로가 열리지 않는다.
 
 #### circuitBreaker.sleepWindowInMilliseconds
 
@@ -63,7 +63,7 @@ For example, if the value is 20, then if only 19 requests are received in the ro
 This property sets the amount of time, after tripping the circuit, to reject requests before allowing attempts again to determine if the circuit should again be closed.
 ```
 
-이 속성은 회로를 트립 한 후 회로를 다시 닫아야하는지 다시 결정하기 전에 요청을 거부하도록 시간을 설정합니다.
+이 속성은 회로를 트립 한 후 회로를 다시 닫아야하는지 다시 결정하기 전에 요청을 거부하도록 시간을 설정한다.
 
 #### circuitBreaker.errorThresholdPercentage
 
@@ -71,7 +71,7 @@ This property sets the amount of time, after tripping the circuit, to reject req
 This property sets the error percentage at or above which the circuit should trip open and start short-circuiting requests to fallback logic.
 ```
 
-이 속성은 오류 발생률을 회로가 열리는 이상으로 설정하고 단락 요청을 대체 논리로 시작합니다.
+이 속성은 오류 발생률을 회로가 열리는 이상으로 설정하고 단락 요청을 대체 논리로 시작한다.
 
 #### metrics.rollingStats.timeInMilliseconds
 
@@ -83,11 +83,11 @@ As of 1.4.12, this property affects the initial metrics creation only, and adjus
 The window is divided into buckets and “rolls” by these increments.
 ```
 
-이 속성은 통계 롤링 창의 기간을 밀리 초 단위로 설정합니다. 이것은 Hystrix가 회로 차단기가 사용하고 게시하기위한 측정 기준을 얼마나 오래 유지하는지입니다.
+이 속성은 통계 롤링 창의 기간을 밀리 초 단위로 설정합니다. 이것은 Hystrix가 회로 차단기가 사용하고 게시하기위한 측정 기준을 얼마나 오래 유지하는 시간이다..
 
-1.4.12부터이 속성은 초기 메트릭 생성에만 영향을 주며 시작 후이 속성에 대한 조정은 적용되지 않습니다. 이렇게하면 메트릭 데이터 손실을 방지하고 메트릭 수집을 최적화 할 수 있습니다.
+1.4.12부터이 속성은 초기 메트릭 생성에만 영향을 주며 시작 후이 속성에 대한 조정은 적용되지 않습니다. 이렇게하면 메트릭 데이터 손실을 방지하고 메트릭 수집을 최적화 할 수 있다.
 
-창은 이러한 증분에 따라 양동이와 "롤"로 나뉩니다.
+창은 이러한 증분에 따라 양동이와 "롤"로 나뉜다.
 
 ![버켓](./Image/버켓.png)
 
@@ -133,3 +133,4 @@ hang에는 무한 루프, 장시간 중단할 수 없는 컴퓨팅, 자원 고�
 - [3](https://supawer0728.github.io/2018/03/11/Spring-Cloud-Hystrix/)
 - [4](https://spring.io/guides/gs/circuit-breaker/)
 
+,
