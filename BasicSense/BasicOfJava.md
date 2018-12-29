@@ -21,6 +21,7 @@
 - AutoBoxing, AutoUnBoxing
 - Call By Value & Call By Reference
 - Exception
+- Servlet
 - Ref
 
 -----
@@ -659,7 +660,11 @@ try {
 
   사용하는 라이브러리, 모듈, 코드 등에서 만들어졌지만, 해당 모듈을 사용하는 객체에게 발생할 예외를 확인해서 처리하는 것을 강제하지 않는 예외를 의미한다. 예외는 발생할 수 있지만, 상위 Caller에게 전달함으로써 최종적으로 JVM이 받아서 처리한다.
 
+-----
 
+## Servlet
+
+서블릿 컨테이너는 개발자가 웹서버와 통신하기 위하여 소켓을 생성하고, 특정 포트에 리스닝하고, 스트림을 생성하는 등의 복잡한 일들을 할 필요가 없게 해준다. 컨테이너는 servlet의 생성부터 소멸까지의 일련의 과정(Lifer Cycle)을 관리한다. 서블릿 컨테이너는 요청이 들어올 때마다 새로운 자바 스레드를 만든다. 우리가 알고 있는 대표적인 Servlet Container가 Tomcat 이다. 톰켓같은 was가 java파일을 컴파일해서 Class로 만들고 메모리에 올려 servlet객체를 만든다.
 
 
 
